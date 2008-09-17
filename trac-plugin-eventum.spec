@@ -1,7 +1,7 @@
 Summary:	Plugin for linking Eventum issues in Trac
 Name:		trac-plugin-eventum
 Version:	0.2
-Release:	0.53
+Release:	1
 License:	BSD-like
 Group:		Applications/WWW
 BuildRequires:	cvs
@@ -26,6 +26,22 @@ cvs -d %{_cvsroot} co %{?_cvstag:-r %{_cvstag}} -d %{name}-%{version} -P %{_cvsm
 cd -
 
 %build
+# skip tagging if we checkouted from tag or have debug enabled
+# also make make tag only if we have integer release
+%if %{!?debug:1}%{?debug:0} && %{!?_cvstag:1}%{?_cvstag:0} && %([[ %{release} = *.* ]] && echo 0 || echo 1)
+# do tagging by version
+tag=%{name}-%(echo %{version} | tr . _)-%(echo %{release} | tr . _)
+
+cd %{_specdir}
+if [ $(cvs status -v %{name}.spec | egrep -c "$tag[[:space:]]") != 0 ]; then
+	: "Tag $tag already exists"
+	exit 1
+fi
+cvs tag $tag %{name}.spec
+cd -
+cvs tag $tag
+%endif
+
 %{__python} setup.py build
 %{__python} setup.py egg_info
 
