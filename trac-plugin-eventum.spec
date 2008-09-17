@@ -1,7 +1,7 @@
 Summary:	Plugin for linking Eventum issues in Trac
 Name:		trac-plugin-eventum
 Version:	0.2
-Release:	1
+Release:	2
 License:	BSD-like
 Group:		Applications/WWW
 BuildRequires:	cvs
@@ -58,10 +58,13 @@ rm -rf $RPM_BUILD_ROOT
 %post
 if [ "$1" = "1" ]; then
 	%banner -e %{name} <<-'EOF'
-	Don't forget to enable eventum in conf/trac.ini:
+	To enable and configure Eventum plugin, configure in conf/trac.ini:
 
 	[components]
 	trac.eventum.* = enabled
+
+	[eventum]
+	url = http://eventum.example.org/view.php?id=%d
 
 	And restart Trac server.
 EOF
