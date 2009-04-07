@@ -1,7 +1,8 @@
+%define     trac_ver    0.11
 Summary:	Plugin for linking Eventum issues in Trac
 Name:		trac-plugin-eventum
 Version:	0.2
-Release:	2
+Release:	3
 License:	BSD-like
 Group:		Applications/WWW
 BuildRequires:	cvs
@@ -9,7 +10,7 @@ BuildRequires:	python-devel
 BuildRequires:	python-setuptools
 BuildRequires:	rpmbuild(macros) >= 1.268
 %pyrequires_eq  python-modules
-Requires:	trac >= 0.10
+Requires:	trac >= %{trac_ver}
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -20,6 +21,16 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Plugin for linking Eventum issues in Trac
 
 %prep
+# check early if build is ok to be performed
+%if %{!?debug:1}%{?debug:0} && %{!?_cvstag:1}%{?_cvstag:0} && %([[ %{release} = *.* ]] && echo 0 || echo 1)
+# break if spec is not commited
+cd %{_specdir}
+if [ "$(cvs status %{name}.spec | awk '/Status:/{print $NF}')" != "Up-to-date" ]; then
+	: "Integer build not allowed: %{name}.spec is not up-to-date with CVS"
+	exit 1
+fi
+cd -
+%endif
 %setup -qcT
 cd ..
 cvs -d %{_cvsroot} co %{?_cvstag:-r %{_cvstag}} -d %{name}-%{version} -P %{_cvsmodule}
