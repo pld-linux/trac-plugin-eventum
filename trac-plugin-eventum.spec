@@ -5,7 +5,7 @@ Version:	0.3
 Release:	1
 License:	BSD-like
 Group:		Applications/WWW
-BuildRequires:	cvs
+BuildRequires:	cvs-client
 BuildRequires:	python-devel
 BuildRequires:	python-setuptools
 BuildRequires:	rpmbuild(macros) >= 1.268
