@@ -2,7 +2,7 @@
 Summary:	Plugin for linking Eventum issues in Trac
 Name:		trac-plugin-eventum
 Version:	0.3
-Release:	1
+Release:	2
 License:	BSD-like
 Group:		Applications/WWW
 BuildRequires:	cvs-client
