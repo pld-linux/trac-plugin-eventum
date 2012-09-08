@@ -1,11 +1,13 @@
 %define     trac_ver    0.12
+%define		plugin		eventum
 Summary:	Plugin for linking Eventum issues in Trac
-Name:		trac-plugin-eventum
+Name:		trac-plugin-%{plugin}
 Version:	0.4
-Release:	1
+Release:	2
 License:	BSD-like
 Group:		Applications/WWW
-BuildRequires:	cvs-client
+Source0:	https://github.com/eventum/trac-plugin-eventum/tarball/%{name}-0_4-1/%{plugin}-%{version}.tgz
+# Source0-md5:	5fa029232b261e1732ac707aa8878f18
 BuildRequires:	python-devel
 BuildRequires:	python-setuptools
 BuildRequires:	rpmbuild(macros) >= 1.268
@@ -14,45 +16,15 @@ Requires:	trac >= %{trac_ver}
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_cvsroot	:ext:cvs.delfi.ee:/usr/local/cvs
-%define		_cvsmodule	trac/plugins/eventum
-
 %description
 Plugin for linking Eventum issues in Trac
 
 %prep
-# check early if build is ok to be performed
-%if %{!?debug:1}%{?debug:0} && %{!?_cvstag:1}%{?_cvstag:0} && %([[ %{release} = *.* ]] && echo 0 || echo 1)
-# break if spec is not commited
-cd %{_specdir}
-if [ "$(cvs status %{name}.spec | awk '/Status:/{print $NF}')" != "Up-to-date" ]; then
-	: "Integer build not allowed: %{name}.spec is not up-to-date with CVS"
-	exit 1
-fi
-cd -
-%endif
-%setup -qcT
-cd ..
-cvs -d %{_cvsroot} co %{?_cvstag:-r %{_cvstag}} -d %{name}-%{version} -P %{_cvsmodule}
-cd -
+%setup -qc
+# for github urls:
+mv *-%{plugin}-*/* .
 
 %build
-# skip tagging if we checkouted from tag or have debug enabled
-# also make make tag only if we have integer release
-%if %{!?debug:1}%{?debug:0} && %{!?_cvstag:1}%{?_cvstag:0} && %([[ %{release} = *.* ]] && echo 0 || echo 1)
-# do tagging by version
-tag=%{name}-%(echo %{version} | tr . _)-%(echo %{release} | tr . _)
-
-cd %{_specdir}
-if [ $(cvs status -v %{name}.spec | grep -Ec "$tag[[:space:]]") != 0 ]; then
-	: "Tag $tag already exists"
-	exit 1
-fi
-cvs tag $tag %{name}.spec
-cd -
-cvs tag $tag
-%endif
-
 %{__python} setup.py build
 %{__python} setup.py egg_info
 
@@ -84,5 +56,5 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%{py_sitescriptdir}/trac/eventum
+%{py_sitescriptdir}/trac/%{plugin}
 %{py_sitescriptdir}/TracEventumLink-*.egg-info
